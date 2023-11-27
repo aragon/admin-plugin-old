@@ -17,6 +17,7 @@ contract AdminSetup is PluginSetup {
     using Clones for address;
 
     /// @notice The address of the `Admin` plugin logic contract to be cloned.
+    // solhint-disable-next-line immutable-vars-naming
     address private immutable implementation_;
 
     /// @notice Thrown if the admin address is zero.
