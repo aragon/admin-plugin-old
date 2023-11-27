@@ -7,13 +7,13 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 contract CloneFactory {
     using Clones for address;
 
-    address private immutable implementation;
+    address private immutable IMPLEMENTATION;
 
     constructor(address _implementation) {
-        implementation = _implementation;
+        IMPLEMENTATION = _implementation;
     }
 
     function deployClone() external returns (address clone) {
-        return implementation.clone();
+        return IMPLEMENTATION.clone();
     }
 }
