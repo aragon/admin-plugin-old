@@ -235,3 +235,8 @@ export async function deployWithProxy<T>(
     constructorArgs: options.constructurArgs || [],
   }) as unknown as Promise<T>;
 }
+
+export function toBytes32(num: number): string {
+  const hex = num.toString(16);
+  return `0x${'0'.repeat(64 - hex.length)}${hex}`;
+}
