@@ -1,7 +1,4 @@
-import {
-  DAO,
-  DAO__factory,
-} from '../typechain';
+import {DAO, DAO__factory} from '../typechain';
 import {deployWithProxy} from './proxy';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {ethers} from 'hardhat';

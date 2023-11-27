@@ -1,13 +1,9 @@
 import metadata from '../../src/build-metadata.json';
-import {
-  AdminSetup,
-  AdminSetup__factory,
-  Admin__factory,
-} from '../../typechain';
-import {getNamedTypesFromMetadata} from '../../utils/metadata';
-import {Operation} from '../../utils/types';
+import {AdminSetup, AdminSetup__factory, Admin__factory} from '../../typechain';
 import {deployNewDAO} from '../../utils/dao';
 import {ADMIN_INTERFACE, getInterfaceID} from '../../utils/interfaces';
+import {getNamedTypesFromMetadata} from '../../utils/metadata';
+import {Operation} from '../../utils/types';
 import {expect} from 'chai';
 import {ethers} from 'hardhat';
 

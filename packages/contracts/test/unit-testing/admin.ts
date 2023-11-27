@@ -11,6 +11,8 @@ import {
 } from '../../typechain';
 import {ProposalCreatedEvent} from '../../typechain/Admin';
 import {ExecutedEvent} from '../../typechain/IDAO';
+import {deployNewDAO} from '../../utils/dao';
+import {OZ_ERRORS} from '../../utils/error';
 import {
   findEvent,
   DAO_EVENTS,
@@ -18,10 +20,8 @@ import {
   MEMBERSHIP_EVENTS,
   findEventTopicLog,
 } from '../../utils/event';
-import {deployNewDAO} from '../../utils/dao';
-import {OZ_ERRORS} from '../../utils/error';
-import {ADMIN_INTERFACE, getInterfaceID} from '../../utils/interfaces';
 import {toBytes32} from '../../utils/helpers';
+import {ADMIN_INTERFACE, getInterfaceID} from '../../utils/interfaces';
 import {SignerWithAddress} from '@nomiclabs/hardhat-ethers/signers';
 import {expect} from 'chai';
 import {ethers} from 'hardhat';
