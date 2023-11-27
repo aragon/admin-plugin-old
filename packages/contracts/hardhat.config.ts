@@ -35,12 +35,10 @@ const apiUrls: NetworkNameMapping = {
 
 export const networks: {[index: string]: NetworkUserConfig} = {
   hardhat: {
-    chainId: 31337,
-    forking: {
-      url: `${
-        apiUrls[process.env.NETWORK_NAME ? process.env.NETWORK_NAME : 'mainnet']
-      }${process.env.INFURA_API_KEY}`,
-    },
+    throwOnTransactionFailures: true,
+    throwOnCallFailures: true,
+    blockGasLimit: 3000000000, // really high to test some things that are only possible with a higher block gas limit
+    gasPrice: 80000000000,
   },
   mainnet: {
     chainId: 1,
@@ -172,7 +170,7 @@ const config: HardhatUserConfig = {
     artifacts: './artifacts',
     cache: './cache',
     sources: './src',
-    tests: './test',
+    tests: './test/unit-testing',
     deploy: './deploy',
   },
 
