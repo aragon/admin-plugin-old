@@ -1,8 +1,4 @@
-import {
-  PluginRepo,
-  MyPluginSetup,
-  MyPluginSetup__factory,
-} from '../../typechain';
+import {PluginRepo, AdminSetup, AdminSetup__factory} from '../../typechain';
 import {getPluginInfo, osxContracts} from '../../utils/helpers';
 import {toHex} from '../../utils/ipfs';
 import {PluginRepoRegistry__factory} from '@aragon/osx-ethers';
@@ -83,11 +79,11 @@ describe('PluginRepo Deployment', function () {
   });
 
   context('PluginSetup Publication', async () => {
-    let setup: MyPluginSetup;
+    let setup: AdminSetup;
 
     before(async () => {
-      setup = MyPluginSetup__factory.connect(
-        (await deployments.get('MyPluginSetup')).address,
+      setup = AdminSetup__factory.connect(
+        (await deployments.get('AdminSetup')).address,
         alice
       );
     });

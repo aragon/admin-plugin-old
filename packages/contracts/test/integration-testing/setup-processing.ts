@@ -1,15 +1,15 @@
 import {METADATA} from '../../plugin-settings';
 import {
   PluginRepo,
-  MyPlugin,
-  MyPluginSetup,
-  MyPluginSetup__factory,
-  MyPlugin__factory,
+  Admin,
+  AdminSetup,
+  AdminSetup__factory,
+  Admin__factory,
 } from '../../typechain';
 import {PluginSetupRefStruct} from '../../typechain/@aragon/osx/framework/dao/DAOFactory';
 import {getPluginInfo, osxContracts} from '../../utils/helpers';
 import {initializeFork} from '../helpers/fixture';
-import {installPLugin, uninstallPLugin} from '../helpers/setup';
+import {installPlugin, uninstallPLugin} from '../helpers/setup';
 import {deployTestDao} from '../helpers/test-dao';
 import {getNamedTypesFromMetadata} from '../helpers/types';
 import {
@@ -79,13 +79,13 @@ describe('PluginSetup Processing', function () {
   });
 
   context('Build 1', async () => {
-    let setup: MyPluginSetup;
+    let setup: AdminSetup;
     let pluginSetupRef: PluginSetupRefStruct;
-    let plugin: MyPlugin;
+    let plugin: Admin;
 
     before(async () => {
       // Deploy setups.
-      setup = MyPluginSetup__factory.connect(
+      setup = AdminSetup__factory.connect(
         (await pluginRepo['getLatestVersion(uint8)'](1)).pluginSetup,
         alice
       );
@@ -102,7 +102,7 @@ describe('PluginSetup Processing', function () {
     beforeEach(async () => {
       // Install build 1.
 
-      const results = await installPLugin(
+      const results = await installPlugin(
         psp,
         dao,
         pluginSetupRef,
@@ -114,10 +114,7 @@ describe('PluginSetup Processing', function () {
         )
       );
 
-      plugin = MyPlugin__factory.connect(
-        results.preparedEvent.args.plugin,
-        alice
-      );
+      plugin = Admin__factory.connect(results.preparedEvent.args.plugin, alice);
     });
 
     it('installs & uninstalls', async () => {
