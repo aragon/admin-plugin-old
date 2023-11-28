@@ -7,6 +7,7 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 contract CloneFactory {
     using Clones for address;
 
+    // solhint-disable-next-line immutable-vars-naming
     address private immutable implementation;
 
     constructor(address _implementation) {
