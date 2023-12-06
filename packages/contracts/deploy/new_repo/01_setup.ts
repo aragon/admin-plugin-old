@@ -1,15 +1,14 @@
-import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log(`\nDeploying ${PLUGIN_SETUP_CONTRACT_NAME}`);
+  console.log("\nDeploying AdminSetup");
 
   const {deployments, getNamedAccounts} = hre;
   const {deploy} = deployments;
   const {deployer} = await getNamedAccounts();
 
-  await deploy(PLUGIN_SETUP_CONTRACT_NAME, {
+  await deploy("AdminSetup", {
     from: deployer,
     args: [],
     log: true,
@@ -17,4 +16,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Deployment'];
+func.tags = ["AdminSetup", "NewRepo"];
