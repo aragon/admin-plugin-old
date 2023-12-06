@@ -70,7 +70,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ['PluginRepo', 'Deployment'];
+func.tags = ['PluginRepo', 'Deployment', 'NewAdminRepo'];
 func.skip = async (hre: HardhatRuntimeEnvironment) => {
   // Skip plugin repo creation if the ENS name is taken already
 
