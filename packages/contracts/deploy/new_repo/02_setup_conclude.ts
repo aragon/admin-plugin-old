@@ -4,12 +4,12 @@ import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {setTimeout} from 'timers/promises';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log("Concluding AdminSetup deployment.\n");
+  console.log('Concluding AdminSetup deployment.\n');
   const [deployer] = await hre.ethers.getSigners();
 
   const {deployments, network} = hre;
 
-  const setupDeployment = await deployments.get("AdminSetup");
+  const setupDeployment = await deployments.get('AdminSetup');
   const setup = AdminSetup__factory.connect(setupDeployment.address, deployer);
   const implementation = Admin__factory.connect(
     await setup.implementation(),
@@ -33,4 +33,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ["AdminSetup", 'Verification', "NewRepo"];
+func.tags = ['AdminSetup', 'Verification', 'NewRepo'];
