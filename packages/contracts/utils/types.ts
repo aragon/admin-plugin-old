@@ -30,3 +30,5 @@ export type TestingFork = {
   osxVersion: string;
   activeContracts: any;
 };
+
+export type VersionTag = [number, number];

@@ -1,4 +1,4 @@
-import {activeContractsList} from '@aragon/osx-ethers';
+import {PluginRepo__factory, activeContractsList} from '@aragon/osx-ethers';
 import {ContractFactory, ContractTransaction} from 'ethers';
 import {
   Interface,
@@ -9,6 +9,9 @@ import {
 import {existsSync, statSync, readFileSync, writeFileSync} from 'fs';
 import {ethers} from 'hardhat';
 import {upgrades} from 'hardhat';
+import { HardhatRuntimeEnvironment } from 'hardhat/types';
+import { VersionTag } from './types';
+import { VersionCreatedEvent } from '../typechain/@aragon/osx/framework/plugin/repo/PluginRepo';
 
 export type NetworkNameMapping = {[index: string]: string};
 
@@ -43,6 +46,10 @@ export function getPluginRepoFactoryAddress(networkName: string) {
 
 export function getPluginRepoRegistryAddress(networkName: string) {
   return getContractAddress(networkName, 'PluginRepoRegistry');
+}
+
+export function getPlaceholderSetupAddress(networkName: string) {
+  return getContractAddress(networkName, 'PlaceholderSetup');
 }
 
 function getContractAddress(networkName: string, contractName: string) {
@@ -239,4 +246,117 @@ export async function deployWithProxy<T>(
 export function toBytes32(num: number): string {
   const hex = num.toString(16);
   return `0x${'0'.repeat(64 - hex.length)}${hex}`;
+}
+
+export type LatestVersion = {
+  versionTag: VersionTag;
+  pluginSetupContract: string;
+  releaseMetadata: string;
+  buildMetadata: string;
+};
+
+function isSorted(latestVersions: LatestVersion[]): boolean {
+  // The list of latest versions has to start with the first release, otherwise something is wrong and we must stop.
+  if (latestVersions[0].versionTag[0] != 1) {
+    return false;
+  }
+
+  for (let i = 0; i < latestVersions.length - 1; i++) {
+    if (
+      !(
+        latestVersions[i + 1].versionTag[0] ==
+        latestVersions[i].versionTag[0] + 1
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
+
+export async function populatePluginRepo(
+  hre: HardhatRuntimeEnvironment,
+  pluginRepoName: string,
+  latestVersions: LatestVersion[]
+): Promise<void> {
+  // make sure that the latestVersions array is sorted by version tag
+  if (!isSorted(latestVersions)) {
+    throw new Error(`${latestVersions} is not sorted in ascending order`);
+  }
+
+  for (const latestVersion of latestVersions) {
+    const releaseNumber = latestVersion.versionTag[0];
+    const latestBuildNumber = latestVersion.versionTag[1];
+
+    const placeholderSetup = getContractAddress(hre.network.name, 'PlaceholderSetup');
+
+    const emptyMetadata = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(''));
+
+    for (let i = 1; i < latestBuildNumber; i++) {
+      await createVersion(
+        hre.aragonPluginRepos[pluginRepoName],
+        placeholderSetup,
+        releaseNumber,
+        emptyMetadata,
+        ethers.utils.hexlify(
+          ethers.utils.toUtf8Bytes(`ipfs://${hre.placeholderBuildCIDPath}`)
+        )
+      );
+    }
+
+    // create latest builds
+    await createVersion(
+      hre.aragonPluginRepos[pluginRepoName],
+      latestVersion.pluginSetupContract,
+      releaseNumber,
+      latestVersion.releaseMetadata,
+      latestVersion.buildMetadata
+    );
+  }
+}
+
+export async function createVersion(
+  pluginRepoContract: string,
+  pluginSetupContract: string,
+  releaseNumber: number,
+  releaseMetadata: string,
+  buildMetadata: string
+): Promise<void> {
+  const signers = await ethers.getSigners();
+
+  const PluginRepo = new PluginRepo__factory(signers[0]);
+  const pluginRepo = PluginRepo.attach(pluginRepoContract);
+
+  const tx = await pluginRepo.createVersion(
+    releaseNumber,
+    pluginSetupContract,
+    releaseMetadata,
+    buildMetadata
+  );
+
+  console.log(`Creating build for release ${releaseNumber} with tx ${tx.hash}`);
+
+  await tx.wait();
+
+  const versionCreatedEvent = await findEvent<VersionCreatedEvent>(
+    tx,
+    'VersionCreated'
+  );
+
+  // Check if versionCreatedEvent is not undefined
+  if (versionCreatedEvent) {
+    console.log(
+      `Created build ${versionCreatedEvent.args.build} for release ${
+        versionCreatedEvent.args.release
+      } with setup address: ${
+        versionCreatedEvent.args.pluginSetup
+      }, with build metadata ${ethers.utils.toUtf8String(
+        buildMetadata
+      )} and release metadata ${ethers.utils.toUtf8String(releaseMetadata)}`
+    );
+  } else {
+    // Handle the case where the event is not found
+    throw new Error('Failed to get VersionCreatedEvent event log');
+  }
 }
