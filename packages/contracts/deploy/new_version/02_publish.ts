@@ -69,53 +69,89 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   // Create Version
-  const tx = await pluginRepo.createVersion(
+  var tx;
+  if (
+    await pluginRepo.callStatic.isGranted(
+      pluginRepo.address,
+      deployer.address,
+      await pluginRepo.MAINTAINER_PERMISSION_ID(),
+      '0x00'
+    )
+  ) {
+
+    tx = await pluginRepo.createVersion(
+      VERSION.release,
+      setup.address,
+      toHex(buildMetadataURI),
+      toHex(releaseMetadataURI)
+    );
+    
+    const blockNumberOfPublication = (await tx.wait()).blockNumber;
+
+    if (setup == undefined || setup?.receipt == undefined) {
+      throw Error('setup deployment unavailable');
+    }
+  
+    const version = await pluginRepo['getLatestVersion(uint8)'](VERSION.release);
+    if (VERSION.release !== version.tag.release) {
+      throw Error('something went wrong');
+    }
+  
+    const implementationAddress = await PluginSetup__factory.connect(
+      setup.address,
+      deployer
+    ).implementation();
+  
+    console.log(
+      `Published ${PLUGIN_SETUP_CONTRACT_NAME} at ${setup.address} in PluginRepo ${PLUGIN_REPO_ENS_NAME} at ${pluginRepo.address} at block ${blockNumberOfPublication}.`
+    );
+  
+    addCreatedVersion(
+      network.name,
+      {release: VERSION.release, build: version.tag.build},
+      {release: releaseMetadataURI, build: buildMetadataURI},
+      blockNumberOfPublication,
+      {
+        name: PLUGIN_SETUP_CONTRACT_NAME,
+        address: setup.address,
+        args: [],
+        blockNumberOfDeployment: setup.receipt.blockNumber,
+      },
+      {
+        name: PLUGIN_CONTRACT_NAME,
+        address: implementationAddress,
+        args: [],
+        blockNumberOfDeployment: setup.receipt.blockNumber,
+      },
+      []
+    );
+
+    return;
+  }
+  
+  tx =  await pluginRepo.populateTransaction.createVersion(
     VERSION.release,
     setup.address,
     toHex(buildMetadataURI),
     toHex(releaseMetadataURI)
   );
-
-  const blockNumberOfPublication = (await tx.wait()).blockNumber;
-
-  if (setup == undefined || setup?.receipt == undefined) {
-    throw Error('setup deployment unavailable');
+  
+  if (!tx.to || !tx.data) {
+    throw new Error(
+      `Failed to populate ${PLUGIN_CONTRACT_NAME} Repo createVersion transaction`
+    );
   }
-
-  const version = await pluginRepo['getLatestVersion(uint8)'](VERSION.release);
-  if (VERSION.release !== version.tag.release) {
-    throw Error('something went wrong');
-  }
-
-  const implementationAddress = await PluginSetup__factory.connect(
-    setup.address,
-    deployer
-  ).implementation();
 
   console.log(
-    `Published ${PLUGIN_SETUP_CONTRACT_NAME} at ${setup.address} in PluginRepo ${PLUGIN_REPO_ENS_NAME} at ${pluginRepo.address} at block ${blockNumberOfPublication}.`
+    `Deployer has no permission to create a new version. Adding managingDAO action`
   );
-
-  addCreatedVersion(
-    network.name,
-    {release: VERSION.release, build: version.tag.build},
-    {release: releaseMetadataURI, build: buildMetadataURI},
-    blockNumberOfPublication,
-    {
-      name: PLUGIN_SETUP_CONTRACT_NAME,
-      address: setup.address,
-      args: [],
-      blockNumberOfDeployment: setup.receipt.blockNumber,
-    },
-    {
-      name: PLUGIN_CONTRACT_NAME,
-      address: implementationAddress,
-      args: [],
-      blockNumberOfDeployment: setup.receipt.blockNumber,
-    },
-    []
-  );
+  hre.managingDAOActions.push({
+    to: tx.to,
+    data: tx.data,
+    value: 0,
+    description: `Creates a new build for release 1 in the ${PLUGIN_CONTRACT_NAME}Repo (${pluginRepo.address}) with AddresslistVotingSetup (${setup.address})`,
+  });
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publication'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'PublishPlugin'];
