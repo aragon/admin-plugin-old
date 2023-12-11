@@ -1,15 +1,16 @@
+import {PLUGIN_SETUP_CONTRACT_NAME} from '../../plugin-settings';
 import {AdminSetup__factory, Admin__factory} from '../../typechain';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 import {setTimeout} from 'timers/promises';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log('Concluding AdminSetup deployment.\n');
+  console.log(`Concluding ${PLUGIN_SETUP_CONTRACT_NAME} deployment.\n`);
   const [deployer] = await hre.ethers.getSigners();
 
   const {deployments, network} = hre;
 
-  const setupDeployment = await deployments.get('AdminSetup');
+  const setupDeployment = await deployments.get(PLUGIN_SETUP_CONTRACT_NAME);
   const setup = AdminSetup__factory.connect(setupDeployment.address, deployer);
   const implementation = Admin__factory.connect(
     await setup.implementation(),
@@ -33,4 +34,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = ['AdminSetup', 'Verification', 'NewRepo'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Verification'];
