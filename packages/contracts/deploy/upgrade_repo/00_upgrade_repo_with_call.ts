@@ -1,18 +1,16 @@
-import { BytesLike } from 'ethers';
-import { PLUGIN_CONTRACT_NAME } from '../../plugin-settings';
+import {PLUGIN_CONTRACT_NAME} from '../../plugin-settings';
 import {PluginRepo__factory, PluginRepoFactory__factory} from '../../typechain';
-import { getPluginInfo, getPluginRepoFactoryAddress } from '../../utils/helpers';
+import {getPluginInfo, getPluginRepoFactoryAddress} from '../../utils/helpers';
+import {BytesLike} from 'ethers';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log(
-    '\nUpgrade the PluginRepo to the new implementation'
-  );
+  console.log('\nUpgrade the PluginRepo to the new implementation');
 
   const {network} = hre;
   const [deployer] = await hre.ethers.getSigners();
-  
+
   const pluginRepoFactoryAddress = await getPluginRepoFactoryAddress(
     network.name
   );
@@ -27,7 +25,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
 
-  const data : BytesLike = '0x0';
+  const data: BytesLike = '0x0';
   const upgradeTX = await pluginRepo.populateTransaction.upgradeToAndCall(
     newPluginRepoImplementation,
     data

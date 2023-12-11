@@ -1,3 +1,5 @@
+import {VersionCreatedEvent} from '../typechain/@aragon/osx/framework/plugin/repo/PluginRepo';
+import {VersionTag} from './types';
 import {PluginRepo__factory, activeContractsList} from '@aragon/osx-ethers';
 import {ContractFactory, ContractTransaction} from 'ethers';
 import {
@@ -9,9 +11,7 @@ import {
 import {existsSync, statSync, readFileSync, writeFileSync} from 'fs';
 import {ethers} from 'hardhat';
 import {upgrades} from 'hardhat';
-import { HardhatRuntimeEnvironment } from 'hardhat/types';
-import { VersionTag } from './types';
-import { VersionCreatedEvent } from '../typechain/@aragon/osx/framework/plugin/repo/PluginRepo';
+import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 export type NetworkNameMapping = {[index: string]: string};
 
@@ -274,7 +274,6 @@ function isSorted(latestVersions: LatestVersion[]): boolean {
   return true;
 }
 
-
 export async function populatePluginRepo(
   hre: HardhatRuntimeEnvironment,
   pluginRepoName: string,
@@ -289,7 +288,10 @@ export async function populatePluginRepo(
     const releaseNumber = latestVersion.versionTag[0];
     const latestBuildNumber = latestVersion.versionTag[1];
 
-    const placeholderSetup = getContractAddress(hre.network.name, 'PlaceholderSetup');
+    const placeholderSetup = getContractAddress(
+      hre.network.name,
+      'PlaceholderSetup'
+    );
 
     const emptyMetadata = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(''));
 

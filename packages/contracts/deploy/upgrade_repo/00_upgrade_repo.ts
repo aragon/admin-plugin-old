@@ -1,17 +1,15 @@
-import { PLUGIN_CONTRACT_NAME } from '../../plugin-settings';
+import {PLUGIN_CONTRACT_NAME} from '../../plugin-settings';
 import {PluginRepo__factory, PluginRepoFactory__factory} from '../../typechain';
-import { getPluginInfo, getPluginRepoFactoryAddress } from '../../utils/helpers';
+import {getPluginInfo, getPluginRepoFactoryAddress} from '../../utils/helpers';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  console.log(
-    '\nUpgrade the PluginRepo to the new implementation'
-  );
+  console.log('\nUpgrade the PluginRepo to the new implementation');
 
   const {network} = hre;
   const [deployer] = await hre.ethers.getSigners();
-  
+
   const pluginRepoFactoryAddress = await getPluginRepoFactoryAddress(
     network.name
   );

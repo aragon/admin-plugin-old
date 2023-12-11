@@ -5,12 +5,16 @@ import {
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
 } from '../../plugin-settings';
-import {addCreatedVersion, getPluginInfo, populatePluginRepo} from '../../utils/helpers';
+import {
+  addCreatedVersion,
+  getPluginInfo,
+  populatePluginRepo,
+} from '../../utils/helpers';
 import {uploadToIPFS} from '../../utils/ipfs';
 import {PluginRepo__factory, PluginSetup__factory} from '@aragon/osx-ethers';
+import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import { ethers } from 'hardhat';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(
@@ -121,8 +125,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     []
   );
-
-
 };
 
 export default func;
