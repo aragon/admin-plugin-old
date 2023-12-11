@@ -69,7 +69,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   // Create Version
-  var tx;
+  let tx;
   if (
     await pluginRepo.callStatic.isGranted(
       pluginRepo.address,
