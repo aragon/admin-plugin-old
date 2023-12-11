@@ -1,4 +1,3 @@
-import { populate } from 'dotenv';
 import {
   METADATA,
   PLUGIN_CONTRACT_NAME,
@@ -6,13 +5,12 @@ import {
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
 } from '../../plugin-settings';
-import {addCreatedVersion, getPluginInfo, populatePluginRepo} from '../../utils/helpers';
+import {addCreatedVersion, getPluginInfo} from '../../utils/helpers';
 import {toHex} from '../../utils/ipfs';
 import {uploadToIPFS} from '../../utils/ipfs';
 import {PluginRepo__factory, PluginSetup__factory} from '@aragon/osx-ethers';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
-import { ethers } from 'hardhat';
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log(

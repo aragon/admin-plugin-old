@@ -1,4 +1,3 @@
-import { populate } from 'dotenv';
 import {
   METADATA,
   PLUGIN_CONTRACT_NAME,
@@ -7,7 +6,6 @@ import {
   VERSION,
 } from '../../plugin-settings';
 import {addCreatedVersion, getPluginInfo, populatePluginRepo} from '../../utils/helpers';
-import {toHex} from '../../utils/ipfs';
 import {uploadToIPFS} from '../../utils/ipfs';
 import {PluginRepo__factory, PluginSetup__factory} from '@aragon/osx-ethers';
 import {DeployFunction} from 'hardhat-deploy/types';

@@ -12,8 +12,6 @@ import { network } from 'hardhat';
     console.log(`Concluding ${PLUGIN_CONTRACT_NAME} plugin's repo deployment.\n`);
     const [deployer] = await hre.ethers.getSigners();
   
-    const {deployments} = hre;
-  
     const pluginRepoFactoryAddress = await getPluginRepoFactoryAddress(network.name);
 
     const pluginRepoFactory = PluginRepoFactory__factory.connect(
