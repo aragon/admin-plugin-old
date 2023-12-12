@@ -44,36 +44,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
 
-  // Check release number
-  const latestRelease = await pluginRepo.latestRelease();
-  if (VERSION.release > latestRelease + 1) {
-    throw Error(
-      `Publishing with release number ${VERSION.release} is not possible. 
-        The latest release is ${latestRelease} and the next release you can publish is release number ${
-        latestRelease + 1
-      }.`
-    );
-  }
-
-  // Check build number
-  const latestBuild = (await pluginRepo.buildCount(VERSION.release)).toNumber();
-  if (VERSION.build <= latestBuild) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-        The latest build is ${latestBuild} and build ${VERSION.build} has been deployed already.`
-    );
-  }
-  if (VERSION.build > latestBuild + 1) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-        The latest build is ${latestBuild} and the next release you can publish is release number ${
-        latestBuild + 1
-      }.`
-    );
-  }
-
   //create version and populate the previous with placeholder
-  await populatePluginRepo(hre, PLUGIN_REPO_ENS_NAME, [
+  let tx = await populatePluginRepo(hre, PLUGIN_REPO_ENS_NAME, [
     {
       versionTag: [VERSION.release, VERSION.build],
       pluginSetupContract: setup.address,
@@ -85,6 +57,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       ),
     },
   ]);
+
+  if (tx===undefined || !tx.to || !tx.data) {
+    throw new Error(
+      `Failed to populate ${PLUGIN_CONTRACT_NAME} Repo createVersion transaction`
+    );
+  }
 
   const blockNumberOfPublication = (await tx.wait()).blockNumber;
 
@@ -128,4 +106,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publication'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publish', 'Populate'];
