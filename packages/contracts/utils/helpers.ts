@@ -278,8 +278,9 @@ export async function populatePluginRepo(
   hre: HardhatRuntimeEnvironment,
   pluginRepoName: string,
   latestVersions: LatestVersion[]
-): Promise<void> {
+): Promise<ContractTransaction | undefined> {
   // make sure that the latestVersions array is sorted by version tag
+  let lastTransaction;
   if (!isSorted(latestVersions)) {
     throw new Error(`${latestVersions} is not sorted in ascending order`);
   }
@@ -293,29 +294,29 @@ export async function populatePluginRepo(
       'PlaceholderSetup'
     );
 
-    const emptyMetadata = ethers.utils.hexlify(ethers.utils.toUtf8Bytes(''));
+    const emptyMetadata = ethers.utils.hexlify(ethers.utils.toUtf8Bytes('{}'));
 
     for (let i = 1; i < latestBuildNumber; i++) {
       await createVersion(
-        hre.aragonPluginRepos[pluginRepoName],
+        getPluginInfo(hre.network.name)[hre.network.name]['address'],
         placeholderSetup,
         releaseNumber,
         emptyMetadata,
-        ethers.utils.hexlify(
-          ethers.utils.toUtf8Bytes(`ipfs://${hre.placeholderBuildCIDPath}`)
-        )
+        emptyMetadata //provide more info in the metadat regarding placeholder
       );
     }
 
     // create latest builds
-    await createVersion(
-      hre.aragonPluginRepos[pluginRepoName],
+    lastTransaction = await createVersion(
+      getPluginInfo(hre.network.name)[hre.network.name]['address'],
       latestVersion.pluginSetupContract,
       releaseNumber,
       latestVersion.releaseMetadata,
       latestVersion.buildMetadata
     );
   }
+
+  return lastTransaction;
 }
 
 export async function createVersion(
@@ -324,7 +325,7 @@ export async function createVersion(
   releaseNumber: number,
   releaseMetadata: string,
   buildMetadata: string
-): Promise<void> {
+): Promise<ContractTransaction> {
   const signers = await ethers.getSigners();
 
   const PluginRepo = new PluginRepo__factory(signers[0]);
@@ -333,8 +334,8 @@ export async function createVersion(
   const tx = await pluginRepo.createVersion(
     releaseNumber,
     pluginSetupContract,
-    releaseMetadata,
-    buildMetadata
+    buildMetadata,
+    releaseMetadata
   );
 
   console.log(`Creating build for release ${releaseNumber} with tx ${tx.hash}`);
@@ -361,4 +362,5 @@ export async function createVersion(
     // Handle the case where the event is not found
     throw new Error('Failed to get VersionCreatedEvent event log');
   }
+  return tx;
 }
