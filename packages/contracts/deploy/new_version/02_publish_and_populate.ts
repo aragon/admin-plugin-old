@@ -45,7 +45,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   //create version and populate the previous with placeholder
-  let tx = await populatePluginRepo(hre, PLUGIN_REPO_ENS_NAME, [
+  const tx = await populatePluginRepo(hre, PLUGIN_REPO_ENS_NAME, [
     {
       versionTag: [VERSION.release, VERSION.build],
       pluginSetupContract: setup.address,
