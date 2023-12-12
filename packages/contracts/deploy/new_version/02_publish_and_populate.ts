@@ -58,7 +58,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
   ]);
 
-  if (tx===undefined || !tx.to || !tx.data) {
+  if (tx === undefined || !tx.to || !tx.data) {
     throw new Error(
       `Failed to populate ${PLUGIN_CONTRACT_NAME} Repo createVersion transaction`
     );
