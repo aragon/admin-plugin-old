@@ -3,7 +3,7 @@ import {
   PLUGIN_REPO_ENS_NAME,
 } from '../../plugin-settings';
 import {PluginRepoFactory__factory, PluginRepo__factory} from '../../typechain';
-import {getPluginRepoFactoryAddress} from '../../utils/helpers';
+import {getPluginInfo, getPluginRepoFactoryAddress} from '../../utils/helpers';
 import {network} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
@@ -29,7 +29,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const pluginRepoBase = await pluginRepoFactory.pluginRepoBase();
 
   hre.aragonToVerifyContracts.push({
-    address: hre.aragonPluginRepos[PLUGIN_REPO_ENS_NAME],
+    address: getPluginInfo(network.name)[network.name]['address'],
     args: [pluginRepoBase, initializeData],
   });
 };
