@@ -5,10 +5,14 @@ import {
   PLUGIN_SETUP_CONTRACT_NAME,
   VERSION,
 } from '../../plugin-settings';
-import {addCreatedVersion, getPluginInfo} from '../../utils/helpers';
-import {toHex} from '../../utils/ipfs';
+import {
+  addCreatedVersion,
+  getPluginInfo,
+  populatePluginRepo,
+} from '../../utils/helpers';
 import {uploadToIPFS} from '../../utils/ipfs';
 import {PluginRepo__factory, PluginSetup__factory} from '@aragon/osx-ethers';
+import {ethers} from 'hardhat';
 import {DeployFunction} from 'hardhat-deploy/types';
 import {HardhatRuntimeEnvironment} from 'hardhat/types';
 
@@ -40,41 +44,25 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     deployer
   );
 
-  // Check release number
-  const latestRelease = await pluginRepo.latestRelease();
-  if (VERSION.release > latestRelease + 1) {
-    throw Error(
-      `Publishing with release number ${VERSION.release} is not possible. 
-      The latest release is ${latestRelease} and the next release you can publish is release number ${
-        latestRelease + 1
-      }.`
-    );
-  }
+  //create version and populate the previous with placeholder
+  const tx = await populatePluginRepo(hre, PLUGIN_REPO_ENS_NAME, [
+    {
+      versionTag: [VERSION.release, VERSION.build],
+      pluginSetupContract: setup.address,
+      releaseMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(releaseMetadataURI)
+      ),
+      buildMetadata: ethers.utils.hexlify(
+        ethers.utils.toUtf8Bytes(buildMetadataURI)
+      ),
+    },
+  ]);
 
-  // Check build number
-  const latestBuild = (await pluginRepo.buildCount(VERSION.release)).toNumber();
-  if (VERSION.build <= latestBuild) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-      The latest build is ${latestBuild} and build ${VERSION.build} has been deployed already.`
+  if (tx === undefined || !tx.to || !tx.data) {
+    throw new Error(
+      `Failed to populate ${PLUGIN_CONTRACT_NAME} Repo createVersion transaction`
     );
   }
-  if (VERSION.build > latestBuild + 1) {
-    throw Error(
-      `Publishing with build number ${VERSION.build} is not possible. 
-      The latest build is ${latestBuild} and the next release you can publish is release number ${
-        latestBuild + 1
-      }.`
-    );
-  }
-
-  // Create Version
-  const tx = await pluginRepo.createVersion(
-    VERSION.release,
-    setup.address,
-    toHex(buildMetadataURI),
-    toHex(releaseMetadataURI)
-  );
 
   const blockNumberOfPublication = (await tx.wait()).blockNumber;
 
@@ -118,4 +106,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publication'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publish', 'Populate'];

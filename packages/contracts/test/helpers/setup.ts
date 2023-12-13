@@ -12,7 +12,7 @@ import {findEvent, hashHelpers} from '../../utils/helpers';
 import {expect} from 'chai';
 import {ContractTransaction} from 'ethers';
 
-export async function installPLugin(
+export async function installPlugin(
   psp: PluginSetupProcessor,
   dao: DAO,
   pluginSetupRef: PluginSetupRefStruct,

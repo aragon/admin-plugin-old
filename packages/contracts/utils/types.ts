@@ -1,10 +1,3 @@
-import {BigNumberish, BytesLike} from 'ethers';
-
-export type VerifyEntry = {
-  address: string;
-  args?: any[];
-};
-
 export type AragonPluginRepos = {
   'address-list-voting': string;
   'token-voting': string;
@@ -38,18 +31,4 @@ export type TestingFork = {
   activeContracts: any;
 };
 
-declare module 'hardhat/types' {
-  interface HardhatRuntimeEnvironment {
-    aragonPluginRepos: AragonPluginRepos;
-    aragonToVerifyContracts: AragonVerifyEntry[];
-    managingDAOMultisigPluginAddress: string;
-    placeholderBuildCIDPath: string;
-    managingDAOActions: {
-      to: string;
-      value: BigNumberish;
-      data: BytesLike;
-      description: string; // Description to be included in proposal metadata
-    }[];
-    testingFork: TestingFork;
-  }
-}
+export type VersionTag = [number, number];
