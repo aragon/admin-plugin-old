@@ -34,4 +34,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Verification'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Verification', 'PlugInVersion'];

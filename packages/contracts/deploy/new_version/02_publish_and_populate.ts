@@ -106,4 +106,4 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 };
 
 export default func;
-func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publish', 'Populate'];
+func.tags = [PLUGIN_SETUP_CONTRACT_NAME, 'Publish', 'Populate', 'PlugInVersion'];
